@@ -47,6 +47,7 @@ object ErrorHandler extends Logging with WaitForIt {
 
         db.run(deactivatePipelineQuery).map { _ =>
           SendEmail(
+            conf.fromEmailAddress,
             owners,
             s"[ACTION NEEDED] Pipline ${pipeline.name} has been deactivated due to scheduling failure",
             errorMessage
@@ -60,6 +61,7 @@ object ErrorHandler extends Logging with WaitForIt {
         // Set schedule failure count
         db.run(setScheduleFailureCountQuery).map { _ =>
           SendEmail(
+            conf.fromEmailAddress,
             owners,
             s"[ACTION NEEDED] Pipline ${pipeline.name} failed to schedule ($newCount/$MaxSchedulingFailure)",
             s"It will be deactivated after the number of schedule failures reach $MaxSchedulingFailure\n\n$errorMessage"
@@ -81,8 +83,9 @@ object ErrorHandler extends Logging with WaitForIt {
   /**
    * @return the SES send ID
    */
-  def cleanupActivityFailed(pipeline: Pipeline, stackTrace: Array[StackTraceElement]): String = {
+  def cleanupActivityFailed(pipeline: Pipeline, stackTrace: Array[StackTraceElement])(implicit conf: StarportSettings): String = {
     SendEmail(
+      conf.fromEmailAddress,
       Seq(PagerDutyEmail, "kexin.xie@salesforce.com"),
       s"[Starport Cleanup Failure] cleanup activity failed for ${pipeline.name}",
       stackTrace.mkString("\n")

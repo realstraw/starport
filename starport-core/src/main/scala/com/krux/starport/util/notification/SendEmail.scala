@@ -8,7 +8,7 @@ import com.amazonaws.services.simpleemail.model._
 
 object SendEmail {
 
-  def apply(toEmailAddresses: Seq[String], subject: String, body: String): String = {
+  def apply(fromEmailAddress: String, toEmailAddresses: Seq[String], subject: String, body: String): String = {
     val client = AmazonSimpleEmailServiceClientBuilder.defaultClient()
     val destination = new Destination().withToAddresses(toEmailAddresses.asJavaCollection)
     val emailMessage = new Message()
@@ -18,8 +18,9 @@ object SendEmail {
     val emailRequest = new SendEmailRequest()
       .withDestination(destination)
       .withMessage(emailMessage)
-      .withSource("no-reply@krux.com")
+      .withSource(fromEmailAddress)
 
     client.sendEmail(emailRequest).getMessageId()
   }
+
 }

@@ -30,6 +30,8 @@ class StarportSettings(val config: Config) extends Serializable {
 
   val pipelinePrefix: String = config.getString("krux.starport.prefix")
 
+  val fromEmailAddress: String = config.getString("krux.starport.from.email")
+
   val extraEnvs: IMap[String, String] = config
     .getConfig("krux.starport.extra_envs").root.asScala.mapValues { v =>
       assert(v.valueType == ConfigValueType.STRING)
